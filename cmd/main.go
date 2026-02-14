@@ -13,10 +13,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = os.Chdir("..")
-	if err != nil {
-		log.Fatal(err)
-	}
 	curDir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
