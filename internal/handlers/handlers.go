@@ -11,7 +11,12 @@ import (
 )
 
 func MainHandler(w http.ResponseWriter, r *http.Request) {
-	file, err := os.ReadFile("../index.html")
+	curDir, err := os.Getwd()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	file, err := os.ReadFile(filepath.Join(curDir, "/index.html"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -34,9 +39,19 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
+
 	scanner := bufio.NewScanner(file)
+
 	formatFile := filepath.Ext(header.Filename)
-	filePath := "../data/" + time.Now().UTC().Format("02.01.2006_15.04.05") + formatFile
+
+	curDir, err := os.Getwd()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	filePath := filepath.Join(curDir, "/data/", time.Now().UTC().Format("02.01.2006_15.04.05"), formatFile)
+
 	fileNew, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -57,5 +72,5 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Write([]byte(dataParsed + "\n"))
 	}
-
+	w.WriteHeader(http.StatusCreated)
 }
