@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/St-Ivanov/sprint6/internal/handlers"
 	"github.com/go-chi/chi/v5"
@@ -25,7 +26,7 @@ func NewHttpServer(loger *log.Logger) *HttpServer {
 	}
 	serv := HttpServer{
 		Loger: loger, Serv: &http.Server{
-			Addr: "8080", Handler: r, ErrorLog: loger, ReadTimeout: 5, WriteTimeout: 10, IdleTimeout: 15,
+			Addr: "8080", Handler: r, ErrorLog: loger, ReadTimeout: time.Duration(5) * time.Second, WriteTimeout: time.Duration(10) * time.Second, IdleTimeout: time.Duration(15) * time.Second,
 		},
 	}
 	return &serv
