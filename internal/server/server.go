@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/St-Ivanov/sprint6/internal/handlers"
-	"github.com/go-chi/chi/v5"
 )
 
 type HttpServer struct {
@@ -15,10 +14,10 @@ type HttpServer struct {
 }
 
 func NewHttpServer(loger *log.Logger) *HttpServer {
-	r := chi.NewRouter()
+	r := http.NewServeMux()
 
-	r.Get("/", handlers.MainHandler)
-	r.Post("/upload", handlers.UploadHandler)
+	r.HandleFunc("/", handlers.MainHandler)
+	r.HandleFunc("/upload", handlers.UploadHandler)
 
 	serv := HttpServer{
 		Loger: loger, Serv: &http.Server{

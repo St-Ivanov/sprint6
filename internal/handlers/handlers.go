@@ -72,5 +72,4 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Write([]byte(dataParsed + "\n"))
 	}
-	w.WriteHeader(http.StatusCreated)
 }
