@@ -40,7 +40,12 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	formatFile := filepath.Ext(header.Filename)
 
-	filePath := filepath.Join("data", time.Now().UTC().Format("02012006_150405")) + formatFile
+	err = os.Chdir("data")
+	if err != nil {
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
+		return
+	}
+	filePath := filepath.Join(time.Now().UTC().Format("02012006_150405")) + formatFile
 
 	fileNew, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
@@ -48,6 +53,12 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer fileNew.Close()
+
+	err = os.Chdir("..")
+	if err != nil {
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "text/html")
 
