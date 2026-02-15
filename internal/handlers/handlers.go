@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/St-Ivanov/sprint6/internal/service"
@@ -29,7 +28,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.MultipartForm.RemoveAll()
 
-	file, header, err := r.FormFile("myFile")
+	file, _, err := r.FormFile("myFile")
 	if err != nil {
 		http.Error(w, "Ошибка при попытке загрузить файл 2", http.StatusInternalServerError)
 		return
@@ -38,9 +37,9 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	scanner := bufio.NewScanner(file)
 
-	formatFile := filepath.Ext(header.Filename)
+	// formatFile := filepath.Ext(header.Filename)
 
-	filePath := "data/" + time.Now().UTC().Format("02012006_150405") + formatFile
+	filePath := "data/" + time.Now().UTC().Format("02012006_150405") + ".txt"
 
 	fileNew, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
