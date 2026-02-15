@@ -40,26 +40,15 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	formatFile := filepath.Ext(header.Filename)
 
-	err = os.Chdir("data")
-	if err != nil {
-		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
-		return
-	}
-
 	filePath := time.Now().UTC().Format("02012006_150405") + formatFile
 
 	fileNew, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	// Я хотел сделать сохранение в отдельную папку, но почему тесты не давали это сделать, хотя на пк всё работало
 	if err != nil {
 		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
 		return
 	}
 	defer fileNew.Close()
-
-	err = os.Chdir("..")
-	if err != nil {
-		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
-		return
-	}
 
 	w.Header().Set("Content-Type", "text/html")
 
