@@ -40,7 +40,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	formatFile := filepath.Ext(header.Filename)
 
-	filePath := filepath.Join("data", time.Now().UTC().Format("02012006_150405"), formatFile)
+	filePath := filepath.Join("data", time.Now().UTC().Format("02012006_150405")) + formatFile
 
 	fileNew, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
