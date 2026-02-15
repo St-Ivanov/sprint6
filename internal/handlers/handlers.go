@@ -24,14 +24,14 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(10)
 	if err != nil {
-		http.Error(w, "Ошибка при попытке загрузить файл 1", http.StatusInternalServerError)
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
 		return
 	}
 	defer r.MultipartForm.RemoveAll()
 
 	file, header, err := r.FormFile("myFile")
 	if err != nil {
-		http.Error(w, "Ошибка при попытке загрузить файл 2", http.StatusInternalServerError)
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
 		return
 	}
 	defer file.Close()
@@ -40,18 +40,26 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	formatFile := filepath.Ext(header.Filename)
 
-	_ = os.Chdir("data")
+	err = os.Chdir("data")
+	if err != nil {
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
+		return
+	}
 
 	filePath := time.Now().UTC().Format("02012006_150405") + formatFile
 
 	fileNew, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		f, _ := os.Getwd()
-		http.Error(w, err.Error()+" "+f, http.StatusInternalServerError)
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
 		return
 	}
 	defer fileNew.Close()
-	_ = os.Chdir("..")
+
+	err = os.Chdir("..")
+	if err != nil {
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "text/html")
 
@@ -63,7 +71,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		_, err = fileNew.WriteString(dataParsed + "\n")
 		if err != nil {
-			http.Error(w, "Ошибка при попытке загрузить файл 4", http.StatusInternalServerError)
+			http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
 			return
 		}
 		w.Write([]byte(dataParsed + "\n"))
