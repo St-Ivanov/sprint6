@@ -11,12 +11,12 @@ import (
 )
 
 func MainHandler(w http.ResponseWriter, r *http.Request) {
-	file, err := os.ReadFile("/index.html")
+	file, err := os.ReadFile("index.html")
 	if err != nil {
 		http.Error(w, "Ошибка при попытке получить HTML страницу", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusOK)
 	w.Write(file)
 }
