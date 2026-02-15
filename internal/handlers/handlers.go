@@ -11,12 +11,7 @@ import (
 )
 
 func MainHandler(w http.ResponseWriter, r *http.Request) {
-	curDir, err := os.Getwd()
-	if err != nil {
-		http.Error(w, "Ошибка при попытке получить HTML страницу", http.StatusInternalServerError)
-		return
-	}
-	file, err := os.ReadFile(filepath.Join(curDir, "/index.html"))
+	file, err := os.ReadFile("/index.html")
 	if err != nil {
 		http.Error(w, "Ошибка при попытке получить HTML страницу", http.StatusInternalServerError)
 	}
@@ -44,13 +39,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	formatFile := filepath.Ext(header.Filename)
 
-	curDir, err := os.Getwd()
-	if err != nil {
-		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
-		return
-	}
-
-	filePath := filepath.Join(curDir, "/data/", time.Now().UTC().Format("02.01.2006_15.04.05"), formatFile)
+	filePath := filepath.Join("data/", time.Now().UTC().Format("02.01.2006_15.04.05"), formatFile)
 
 	fileNew, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
@@ -72,4 +61,5 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Write([]byte(dataParsed + "\n"))
 	}
+	w.WriteHeader(http.StatusOK)
 }
