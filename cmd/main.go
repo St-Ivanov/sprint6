@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/St-Ivanov/sprint6/internal/server"
 )
@@ -14,11 +13,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	curDir, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-	file, err := os.OpenFile(filepath.Join(curDir, "/log/info.log"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	file, err := os.OpenFile("log/info.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 		return
