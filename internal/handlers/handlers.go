@@ -13,12 +13,12 @@ import (
 func MainHandler(w http.ResponseWriter, r *http.Request) {
 	curDir, err := os.Getwd()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Ошибка при попытке получить HTML страницу", http.StatusInternalServerError)
 		return
 	}
 	file, err := os.ReadFile(filepath.Join(curDir, "/index.html"))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Ошибка при попытке получить HTML страницу", http.StatusInternalServerError)
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
@@ -28,14 +28,14 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(10)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
 		return
 	}
 	defer r.MultipartForm.RemoveAll()
 
 	file, header, err := r.FormFile("myFile")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
 		return
 	}
 	defer file.Close()
@@ -46,7 +46,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	curDir, err := os.Getwd()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
 		return
 	}
 
@@ -54,7 +54,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	fileNew, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
 		return
 	}
 	defer fileNew.Close()
@@ -67,7 +67,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		_, err = fileNew.WriteString(dataParsed + "\n")
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
 			return
 		}
 		w.Write([]byte(dataParsed + "\n"))
