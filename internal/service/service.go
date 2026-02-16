@@ -1,26 +1,18 @@
 package service
 
 import (
-	"github.com/St-Ivanov/sprint6/internal/errors"
+	"strings"
+	"unicode"
+
 	"github.com/St-Ivanov/sprint6/pkg/morse"
 )
 
-func DataConversion(data string) (string, error) {
+func DataConversion(data string) string {
 	if len(data) == 0 {
-		return "", errors.ErrEmptyValue
+		return ""
 	}
-	if isMorseCode(data) {
-		return morse.ToText(data), nil
+	if strings.ContainsFunc(data, unicode.IsLetter) {
+		return morse.ToMorse(data)
 	}
-	return morse.ToMorse(data), nil
-}
-
-// Проверка строка содержит азбуку морзе.
-func isMorseCode(data string) bool {
-	for _, val := range data {
-		if val != rune('.') && val != rune('-') && val != rune(' ') {
-			return false
-		}
-	}
-	return true
+	return morse.ToText(data)
 }

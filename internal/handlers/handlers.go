@@ -1,7 +1,8 @@
 package handlers
 
 import (
-	"bufio"
+	"bytes"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -11,24 +12,10 @@ import (
 )
 
 func MainHandler(w http.ResponseWriter, r *http.Request) {
-	file, err := os.ReadFile("index.html")
-	if err != nil {
-		http.Error(w, "Ошибка при попытке получить HTML страницу", http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "text/html")
-	w.WriteHeader(http.StatusOK)
-	w.Write(file)
+	http.ServeFile(w, r, "./index.html")
 }
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(10)
-	if err != nil {
-		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
-		return
-	}
-	defer r.MultipartForm.RemoveAll()
-
 	file, header, err := r.FormFile("myFile")
 	if err != nil {
 		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
@@ -36,34 +23,32 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
+	var buf bytes.Buffer
+	_, err = buf.ReadFrom(file)
+	if err != nil {
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
+		return
+	}
 
 	formatFile := filepath.Ext(header.Filename)
 
-	filePath := time.Now().UTC().Format("02012006_150405") + formatFile
+	filePath := "./data/" + time.Now().UTC().Format("02012006_150405") + formatFile
 
 	fileNew, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-	// Я хотел сделать сохранение в отдельную папку, но почему тесты не давали это сделать, хотя на пк всё работало
 	if err != nil {
 		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
 		return
 	}
 	defer fileNew.Close()
 
-	w.Header().Set("Content-Type", "text/html")
-
-	for scanner.Scan() {
-		data := scanner.Text()
-		dataParsed, err := service.DataConversion(data)
-		if err != nil {
-			continue
-		}
-		_, err = fileNew.WriteString(dataParsed + "\n")
-		if err != nil {
-			http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
-			return
-		}
-		w.Write([]byte(dataParsed + "\n"))
-	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
+
+	dataParsed := service.DataConversion(buf.String())
+	_, err = fileNew.WriteString(dataParsed)
+	if err != nil {
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprint(w, dataParsed)
 }
