@@ -12,10 +12,19 @@ import (
 )
 
 func MainHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Ошибка при попытке загрузить главную страницу", http.StatusInternalServerError)
+		return
+	}
 	http.ServeFile(w, r, "./index.html")
 }
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
+		return
+	}
+
 	file, header, err := r.FormFile("myFile")
 	if err != nil {
 		http.Error(w, "Ошибка при попытке загрузить файл", http.StatusInternalServerError)
